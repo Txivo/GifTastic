@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<title>giphy</title>
+
+
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<!-- LINK TO FIREBASE GOES HERE -->
+<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+
+<style type="text/css">
+button,
+div,
+form,
+input {
+margin: 10px;
+}
+</style>
+</head>
+
+<body>
+
+
+<div class="container">
+
+<!-- giphy logo -->
+<img src="/Users/txivo/Desktop/PoweredBy_200_Horizontal_Light-Backgrounds_With_Logo.gif" alt="logo">
+
+<!-- Jumbotron -->
+<div class="jumbotron">
+<h1 class="text-center">GifTastic</h1>
+</div>
+
+
+
+<!-- top column-->
+<div class="row">
+<div class="col-lg-12">
+<div class="card">
+<div class="card-heading">
+<h3 class="card-title">Gif"s</h3>
+
+<!-- buttons created with animal names -->
+<div id="buttons-view"></div>
+</div>
+</div>
+
+
+
+
+<!-- Left row 1 -->
+
+<div class="row">
+
+<div class="col-lg-5 ml-auto">
+<div class="card">
+<div class="card-heading">
+<h3 class="card-title">Gif display</h3>
+</div>
+<!-- animals gif will Get Dumped Dere -->
+<div id="animals-view"></div>
+</div>
+</div>
+
+
+
+<!-- Right row 1-->
+
+<div class="col-lg-5 ml-auto">
+<div class="card">
+<div class="card-heading">
+<h3 class="card-title">Search Box</h3>
+</div>
+
+
+<!-- Rendered Buttons will get Dumped Here -->
+<form id="animal-form">
+<label for="animal-input">Add Gif</label>
+<input type="text" id="animal-input">
+<br>
+<!-- Button triggers new animal to be added -->
+<input id="add-animal" type="submit" value="submit">
+</form>
+</div>
+</div>
+
+
+
+<!-- javascript CODE HERE -->
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+var apikey = "Q9xAVWQlunnHRYiKkuoSRLpRbKqqXMMB"
+
+// giphy
+
+ 
+
+
+// Initial array of animals
+var animals = [];
+
+// displayanimalInfo function re-renders the HTML to display the appropriate content
+function displayanimalInfo() {
+
+// var animal = $(this).attr("data-name");
+var animal = $(this).attr("data-name");
+var queryURL ="http://api.giphy.com/v1/gifs/search?q="+ animal + "&api_key=" + apikey + "&limit=10";
+
+// Creating an AJAX call for the specific animal button being clicked
+$.ajax({
+url: queryURL,
+method: "GET"
+}).then(function(response) {
+console.log(response);
+// Creating a div to hold the animal
+
+for (var i=0;i < 10 ;i++ ){
+
+var animalDiv = $("<div class='animal'>");
+
+// Storing the rating data
+var rating = response.data[i].rating;
+
+// Creating an element to have the rating displayed
+var pOne = $("<p>").text("Rating: " + rating);
+
+// Displaying the rating
+animalDiv.append(pOne);
+
+// Retrieving the URL for the image
+
+
+var imgURL = response.data[i].images.fixed_width.url; 
+var imgURLstill = response.data[i].images.original_still.url;
+// var state = 
+
+
+// Creating an element to hold the image
+var image = $("<img>");
+image.attr("src", imgURL);
+image.attr("data-still", imgURLstill);
+image.attr("data-state", "animate");
+image.attr("data-animate", imgURL);
+// var image = $("<img>").attr("src", imgURLstill);
+//fixed_width_small
+
+
+
+// Appending the image
+animalDiv.append(image);
+
+// Putting the entire animal above the previous animals
+$("#animals-view").prepend(animalDiv);
+}
+
+});
+
+}
+
+// Function for displaying animal data
+function renderButtons() {
+
+// Deleting the animals prior to adding new animals
+// (this is necessary otherwise you will have repeat buttons)
+$("#buttons-view").empty();
+
+// Looping through the array of animals
+for (var i = 0; i < animals.length; i++) {
+
+// Then dynamicaly generating buttons for each animal in the array
+// This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
+var a = $("<button>");
+// Adding a class of animal-btn to our button
+a.addClass("animal-btn");
+// Adding a data-attribute
+a.attr("data-name", animals[i]);
+// Providing the initial button text
+a.text(animals[i]);
+// Adding the button to the buttons-view div
+$("#buttons-view").append(a);
+}
+}
+
+// This function handles events where a animal button is clicked
+$("#add-animal").on("click", function(event) {
+event.preventDefault();
+// This line grabs the input from the textbox
+var animal = $("#animal-input").val().trim();
+
+// Adding animal from the textbox to our array
+animals.push(animal);
+
+// Calling renderButtons which handles the processing of our animal array
+renderButtons();
+});
+
+// Adding a click event listener to all elements with a class of "animal-btn"
+$(document).on("click", ".animal-btn", displayanimalInfo);
+
+// Calling the renderButtons function to display the intial buttons
+renderButtons();
+
+$(document).on("click", "img", function() {
+      // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+      var state = $(this).attr("data-state");
+      // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+      // Then, set the image's data-state to animate
+      // Else set src to the data-still value
+      if (state === "still") {
+        $(this).attr("src", $(this).attr("data-animate"));
+        $(this).attr("data-state", "animate");
+      } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+    });
+</script>
+</div>
+</body>
+
+</html>
