@@ -1,1 +1,1 @@
-# GifTastic
+# GifTastic- https://txivo.github.io/GifTastic/
